@@ -63,8 +63,9 @@
 
 				scene = new THREE.Scene();
 
-				new GLTFLoader().setPath( '/' );
-					.load( 'cobra-450.glb', function ( gltf ) {
+				var loader = new GLTFLoader().setPath( '/' );
+				
+				loader.load( 'cobra-450.glb', function ( gltf ) {
 
 						scene.add( gltf.scene );
 
