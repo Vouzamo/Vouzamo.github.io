@@ -68,7 +68,7 @@
 				loader.load( 'cobra-450.glb', function ( gltf ) {
 
 						console.log(gltf);
-						scene.add( gltf.scene );
+						scene.add( gltf.scene.children[0] );
 
 						render();
 
