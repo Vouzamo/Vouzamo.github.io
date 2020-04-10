@@ -84,11 +84,11 @@
 
 				// mesh
 				//var filename = "NX_HAD401.json";
-				var filename = "cobra-450.json";
+				var filename = "cobra-450.glb";
 
-				var objectLoader = new THREE.ObjectLoader();
+				var objectLoader = new THREE.GLTFLoader();
 				objectLoader.load(filename, function ( loaded ) {
-					subject = loaded.children[0];
+					subject = loaded.asset;
 
 					var scale = 600;
 					subject.scale.set(scale, scale, scale);
