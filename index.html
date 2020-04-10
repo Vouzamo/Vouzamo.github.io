@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - Clara.io JSON loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+				text-align: center;
+			}
+
+			a {
+				color: #fff;
+			}
+
+			#viewer3d {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translateX(-50%) translateY(-50%);
+
+				width: 600px;
+				height: 600px;
+
+				cursor: pointer;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body>
+		<h1>Omron 3D Viewer PoC</h1>
+		<p>3D Viewer will load below. It will animate a rotation around the z-axis but you can drag to view any angle of the rendered object and zoom with the mousewheel or pinch to zoom.</p>
+		<p>This model is a JSON data source created by conversion from an STEP format Omron CAD file available <a href="" target="_blank">here</a>.</p>
+		<div id="viewer3d"></div>
+
+		<script src="https://threejs.org/build/three.js"></script>
+
+		<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+		<script src="https://threejs.org/examples/js/Detector.js"></script>
+
+		<script>
+			var container, stats;
+			var subject;
+			var camera, scene, renderer, controls;
+			var mouseX = 0, mouseY = 0;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+				container = document.getElementById( 'viewer3d' );
+				var width = container.scrollWidth;
+				var height = container.scrollHeight;
+
+				console.log('w: ' + width + ', h:' + height);
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2000 );
+				camera.position.set(600, 600, 0);
+				camera.lookAt(0, 0, 0);
+
+				// scene
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.position.setY(-(height / 4));
+
+				// lighting
+				hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+				hemiLight.color.setHSL( 1, 1, 1 );
+				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+				hemiLight.position.set( 0, 50, 0 );
+				scene.add( hemiLight );
+
+				var light = new THREE.AmbientLight( 0x222222 );
+				scene.add( light );
+
+				// mesh
+				//var filename = "NX_HAD401.json";
+				var filename = "cobra-450.json";
+
+				var objectLoader = new THREE.ObjectLoader();
+				objectLoader.load(filename, function ( loaded ) {
+					subject = loaded.children[0];
+
+					var scale = 600;
+					subject.scale.set(scale, scale, scale);
+
+				 	scene.add(subject);
+				} );
+				
+				// renderer
+				renderer = new THREE.WebGLRenderer({ alpha: true });
+				//renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( width, height );
+
+				container.appendChild( renderer.domElement );
+
+				controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.25;
+
+				controls.screenSpacePanning = false;
+
+				controls.minDistance = 200;
+				controls.maxDistance = 800;
+
+				controls.maxPolarAngle = Math.PI;
+
+				controls.autoRotate = true;
+
+				//window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function onWindowResize() {
+
+				var width = container.scrollWidth;
+				var height = container.scrollHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+				renderer.setSize( width, height );
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+				controls.update();
+				render();
+			}
+
+			function render() {
+				renderer.render( scene, camera );
+			}
+		</script>
+
+	</body>
+</html>
